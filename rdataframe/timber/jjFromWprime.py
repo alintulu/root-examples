@@ -14,6 +14,10 @@ a.Define('Dijet_deltaEta', 'DeltaPhi(FatJet_eta[0], FatJet_eta[1])') # [deltaEta
 a.Cut('deltaR < 3.7', 'Dijet_deltaR < 3.7') # Cut events
 a.Cut('|deltaEta| < 2', 'abs(Dijet_deltaEta) < 2') # Cut events
 
+# Cut-flow report (OBS(!!) comment out DeltaPhi or it will break)
+report = a.DataFrame.Report()
+report.Print()
+
 c0 = ROOT.TCanvas("c", "", 800, 700)
 h = a.DataFrame.Histo1D('Dijet_mass')
 h.Draw('histe')

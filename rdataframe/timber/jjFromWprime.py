@@ -4,45 +4,66 @@ import ROOT
 fpath = '/eos/user/a/adlintul/SWAN_projects/RDataFrame-test/NanoAOD.root'
 a = analyzer(fpath)
 
+#--------------------------------------------------------------
+# Cut events without two FatJets (IMPORTANT(!) rest of code will segfault without it)
+
 a.Cut('Two FatJets', 'nFatJet==2') # Cut events
-a.Cut('|Eta| < 2.4','abs(FatJet_eta[0]) < 2.4 && abs(FatJet_eta[1]) < 2.4') # Cut events
-a.Cut('Pt > 200','FatJet_pt[0] > 200 && FatJet_pt[1] > 200') # Cut events
+#--------------------------------------------------------------
+
+#--------------------------------------------------------------
+# Define necessary columns
+
 a.Define("Dijet_mass", "InvariantMass(FatJet_pt, FatJet_eta, FatJet_phi, FatJet_mass)") # [Mass Mass Mass ...] 
 a.Define('Dijet_deltaR', 'DeltaR(FatJet_eta[0], FatJet_eta[1], FatJet_phi[0], FatJet_phi[1])') # [deltaR, deltaR, deltaR ...]
 a.Define('Dijet_deltaPhi', 'DeltaPhi(FatJet_phi[0], FatJet_phi[1])') # [deltaPhi, deltaPhi, deltaPhi ...]
 a.Define('Dijet_deltaEta', 'DeltaPhi(FatJet_eta[0], FatJet_eta[1])') # [deltaEta, deltaEta, deltaEta ...]
+#--------------------------------------------------------------
+
+#--------------------------------------------------------------
+# Cut necessary columns
+
+a.Cut('|Eta| < 2.4','abs(FatJet_eta[0]) < 2.4 && abs(FatJet_eta[1]) < 2.4') # Cut events
+a.Cut('Pt > 200','FatJet_pt[0] > 200 && FatJet_pt[1] > 200') # Cut events
 a.Cut('deltaR < 3.7', 'Dijet_deltaR < 3.7') # Cut events
 a.Cut('|deltaEta| < 2', 'abs(Dijet_deltaEta) < 2') # Cut events
+#--------------------------------------------------------------
 
-# Cut-flow report (OBS(!!) comment out DeltaPhi or it will break)
-report = a.DataFrame.Report()
-report.Print()
+#--------------------------------------------------------------
+# Cut-flow report (OBS(!) does not work with 'DeltaPhi()' for some reason)
+
+# report = a.DataFrame.Report()
+# report.Print()
+#--------------------------------------------------------------
+
+#--------------------------------------------------------------
+# Draw histograms and 2D plots
 
 c0 = ROOT.TCanvas("c", "", 800, 700)
 h = a.DataFrame.Histo1D('Dijet_mass')
 h.Draw('histe')
-c0.SaveAs("plots/invmass/dijet_mass_cutEtaPtDeltaRDeltaEta.png")
+c0.SaveAs("plots/jjFromWprime/invmass/dijet_mass_cutEtaPtDeltaRDeltaEta.png")
 
-# c1 = ROOT.TCanvas("c", "", 800, 700)
-# g1 = a.DataFrame.Graph("Dijet_mass", "Dijet_deltaR")
-# g1.SetMarkerSize(3)
-# g1.SetMarkerStyle(7)
-# g1.Draw("AP")
-# c1.SaveAs("plots/2d/dijet_2D_massVsdeltaR_cut.png")
+c1 = ROOT.TCanvas("c", "", 800, 700)
+g1 = a.DataFrame.Graph("Dijet_mass", "Dijet_deltaR")
+g1.SetMarkerSize(3)
+g1.SetMarkerStyle(7)
+g1.Draw("AP")
+c1.SaveAs("plots/jjFromWprime/2d/dijet_2D_massVsdeltaR_cut.png")
 
-# c2 = ROOT.TCanvas("c", "", 800, 700)
-# g2 = a.DataFrame.Graph("Dijet_mass", "Dijet_deltaPhi")
-# g2.SetMarkerSize(3)
-# g2.SetMarkerStyle(7)
-# g2.Draw("AP")
-# c2.SaveAs("plots/2d/dijet_2D_massVsdeltaPhi.png")
+c2 = ROOT.TCanvas("c", "", 800, 700)
+g2 = a.DataFrame.Graph("Dijet_mass", "Dijet_deltaPhi")
+g2.SetMarkerSize(3)
+g2.SetMarkerStyle(7)
+g2.Draw("AP")
+c2.SaveAs("plots/jjFromWprime/2d/dijet_2D_massVsdeltaPhi.png")
 
 c3 = ROOT.TCanvas("c", "", 800, 700)
 g3 = a.DataFrame.Graph("Dijet_mass", "Dijet_deltaEta")
 g3.SetMarkerSize(3)
 g3.SetMarkerStyle(7)
 g3.Draw("AP")
-c3.SaveAs("plots/2d/dijet_2D_massVsdeltaEta_cut.png")
+c3.SaveAs("plots/jjFromWprime/2d/dijet_2D_massVsdeltaEta_cut.png")
+#--------------------------------------------------------------
 
 #raw_input('')
 
